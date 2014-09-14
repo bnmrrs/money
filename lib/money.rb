@@ -23,6 +23,6 @@
 require 'bigdecimal'
 require 'i18n' rescue LoadError
 require 'money/currency'
-require 'money/high_accurracy'
+require 'money/high_accuracy'
 require 'money/money'
 require 'money/core_extensions'
