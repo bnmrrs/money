@@ -232,6 +232,12 @@ class Money
     # @return [Integer]
     attr_reader :subunit_to_unit
 
+    alias_method :original_subunit_to_unit, :subunit_to_unit
+
+    def subunit_to_unit
+      original_subunit_to_unit * Money::Currency::HighAccuracy::FACTOR
+    end
+
     # The decimal mark, or character used to separate the whole unit from the subunit.
     #
     # @return [String]
@@ -257,12 +263,12 @@ class Money
     #
     # @return [Integer]
     def decimal_places
-      if subunit_to_unit == 1
+      if original_subunit_to_unit == 1
         0
-      elsif subunit_to_unit % 10 == 0
-        Math.log10(subunit_to_unit).to_s.to_i
+      elsif original_subunit_to_unit % 10 == 0
+        Math.log10(original_subunit_to_unit).to_s.to_i
       else
-        Math.log10(subunit_to_unit).to_s.to_i+1
+        Math.log10(original_subunit_to_unit).to_s.to_i+1
       end
     end
 
