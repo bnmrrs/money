@@ -256,12 +256,11 @@ class Money
   def to_s
     unit, subunit  = cents.abs.divmod(currency.subunit_to_unit).map{|o| o.to_s}
     if currency.decimal_places == 0
-      return "-#{unit}" if cents < 0
-      return unit
+      return "#{'-' if cents < 0}#{unit}"
     end
-    subunit = (("0" * currency.decimal_places) + subunit)[(-1*currency.decimal_places)..-1]
-    return "-#{unit}#{decimal_mark}#{subunit}" if cents < 0
-    "#{unit}#{decimal_mark}#{subunit}"
+
+    subunit = subunit.ljust(currency.decimal_places, '0')[0..(currency.decimal_places-1)]
+    "#{'-' if cents < 0}#{unit}#{decimal_mark}#{subunit}"
   end
 
   # Return the amount of money as a BigDecimal.
