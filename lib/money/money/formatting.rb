@@ -143,7 +143,7 @@ class Money
       # support for old format parameters
       rules = normalize_formatting_rules(rules)
 
-      if original_cents == 0
+      if high_accuracy_cents == 0
         if rules[:display_free].respond_to?(:to_str)
           return rules[:display_free]
         elsif rules[:display_free]
@@ -173,7 +173,7 @@ class Money
                     "#{self.to_s}"
                   end
 
-      if rules[:no_cents_if_whole] && original_cents % currency.subunit_to_unit == 0
+      if rules[:no_cents_if_whole] && high_accuracy_cents % currency.subunit_to_unit == 0
         formatted = "#{self.to_s.to_i}"
       end
 

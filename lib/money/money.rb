@@ -16,10 +16,10 @@ class Money
   # @return [Integer]
   attr_reader :cents
 
-  alias_method :original_cents, :cents
+  alias_method :high_accuracy_cents, :cents
 
   def cents
-    original_cents / Money::Currency::HighAccuracy::FACTOR
+    high_accuracy_cents / Money::Currency::HighAccuracy::FACTOR
   end
 
   # The currency the money is in.
@@ -240,7 +240,7 @@ class Money
   # @example
   #   Money.new(100).hash #=> 908351
   def hash
-    [original_cents.hash, currency.hash].hash
+    [high_accuracy_cents.hash, currency.hash].hash
   end
 
   # Uses +Currency#symbol+. If +nil+ is returned, defaults to "¤".
@@ -260,13 +260,13 @@ class Money
   # @example
   #   Money.ca_dollar(100).to_s #=> "1.00"
   def to_s
-    unit, subunit  = original_cents.abs.divmod(currency.subunit_to_unit).map{|o| o.to_s}
+    unit, subunit  = high_accuracy_cents.abs.divmod(currency.subunit_to_unit).map{|o| o.to_s}
     if currency.decimal_places == 0
-      return "#{'-' if original_cents < 0}#{unit}"
+      return "#{'-' if high_accuracy_cents < 0}#{unit}"
     end
 
     subunit = subunit.rjust(Money::Currency::HighAccuracy::FACTOR.to_s.size + 1, '0')[0..(currency.decimal_places-1)]
-    "#{'-' if original_cents < 0}#{unit}#{decimal_mark}#{subunit}"
+    "#{'-' if high_accuracy_cents < 0}#{unit}#{decimal_mark}#{subunit}"
   end
 
   # Return the amount of money as a BigDecimal.
@@ -276,7 +276,7 @@ class Money
   # @example
   #   Money.us_dollar(100).to_d => BigDecimal.new("1.0")
   def to_d
-    BigDecimal.new(original_cents.to_s) / BigDecimal.new(currency.subunit_to_unit.to_s)
+    BigDecimal.new(high_accuracy_cents.to_s) / BigDecimal.new(currency.subunit_to_unit.to_s)
   end
 
   # Return the amount of money as a float. Floating points cannot guarantee
@@ -353,7 +353,7 @@ class Money
   #
   # @return [String]
   def inspect
-    "#<Money cents:#{original_cents} currency:#{currency}>"
+    "#<Money cents:#{high_accuracy_cents} currency:#{currency}>"
   end
 
   # Allocates money between different parties without loosing pennies.
@@ -372,10 +372,10 @@ class Money
     allocations = splits.inject(0.0) {|sum, i| sum += i }
     raise ArgumentError, "splits add to more then 100%" if (allocations - 1.0) > Float::EPSILON
 
-    left_over = original_cents
+    left_over = high_accuracy_cents
 
     amounts = splits.collect do |ratio|
-      fraction = (original_cents * ratio / allocations).floor
+      fraction = (high_accuracy_cents * ratio / allocations).floor
       left_over -= fraction
       fraction
     end
@@ -395,10 +395,10 @@ class Money
   #   Money.new(100, "USD").split(3) #=> [Money.new(34), Money.new(33), Money.new(33)]
   def split(num)
     raise ArgumentError, "need at least one party" if num < 1
-    low = Money.new(original_cents / num)
-    high = Money.new(low.original_cents + 1)
+    low = Money.new(high_accuracy_cents / num)
+    high = Money.new(low.high_accuracy_cents + 1)
 
-    remainder = original_cents % num
+    remainder = high_accuracy_cents % num
     result = []
 
     num.times do |index|
