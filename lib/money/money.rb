@@ -19,7 +19,9 @@ class Money
   alias_method :high_accuracy_cents, :cents
 
   def cents
-    high_accuracy_cents / Money::Currency::HighAccuracy::FACTOR
+    # we round to the inverse of the factor, and then drop the zero's
+    # this means the #cents behaviour will be identical to what it was before
+    high_accuracy_cents.round(-(Money::Currency::HighAccuracy::FACTOR.to_s.size - 1)) / Money::Currency::HighAccuracy::FACTOR
   end
 
   # The currency the money is in.
