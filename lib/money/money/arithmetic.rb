@@ -227,7 +227,7 @@ class Money
     #   Money.new(100).zero? #=> false
     #   Money.new(0).zero?   #=> true
     def zero?
-      original_cents == 0
+      cents == 0
     end
 
     # Test if the money amount is non-zero. Returns this money object if it is
@@ -239,7 +239,7 @@ class Money
     #   Money.new(100).nonzero? #=> #<Money @cents=100>
     #   Money.new(0).nonzero?   #=> nil
     def nonzero?
-      original_cents != 0 ? self : nil
+      cents != 0 ? self : nil
     end
 
   end
