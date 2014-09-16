@@ -355,7 +355,7 @@ class Money
   #
   # @return [String]
   def inspect
-    "#<Money cents:#{high_accuracy_cents} currency:#{currency}>"
+    "#<Money high_accuracy_cents:#{high_accuracy_cents} currency:#{currency}>"
   end
 
   # Allocates money between different parties without loosing pennies.
