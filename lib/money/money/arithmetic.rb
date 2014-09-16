@@ -57,9 +57,9 @@ class Money
     #   Money.new(100) + Money.new(100) #=> #<Money @cents=200>
     def +(other_money)
       if currency == other_money.currency
-        Money.new(cents + other_money.cents, other_money.currency)
+        Money.new(original_cents + other_money.original_cents, other_money.currency)
       else
-        Money.new(cents + other_money.exchange_to(currency).cents, currency)
+        Money.new(original_cents + other_money.exchange_to(currency).original_cents, currency)
       end
     end
 
@@ -76,9 +76,9 @@ class Money
     #   Money.new(100) - Money.new(99) #=> #<Money @cents=1>
     def -(other_money)
       if currency == other_money.currency
-        Money.new(cents - other_money.cents, other_money.currency)
+        Money.new(original_cents - other_money.original_cents, other_money.currency)
       else
-        Money.new(cents - other_money.exchange_to(currency).cents, currency)
+        Money.new(original_cents - other_money.exchange_to(currency).original_cents, currency)
       end
     end
 
@@ -100,7 +100,7 @@ class Money
       if value.is_a?(Money)
         raise ArgumentError, "Can't multiply a Money by a Money"
       else
-        Money.new(cents * value, currency)
+        Money.new(original_cents * value, currency)
       end
     end
 
@@ -122,12 +122,12 @@ class Money
     def /(value)
       if value.is_a?(Money)
         if currency == value.currency
-          (cents / BigDecimal.new(value.cents.to_s)).to_f
+          (original_cents / BigDecimal.new(value.original_cents.to_s)).to_f
         else
-          (cents / BigDecimal(value.exchange_to(currency).cents.to_s)).to_f
+          (original_cents / BigDecimal(value.exchange_to(currency).original_cents.to_s)).to_f
         end
       else
-        Money.new(cents / value, currency)
+        Money.new(original_cents / value, currency)
       end
     end
 
@@ -156,12 +156,12 @@ class Money
     #   Money.new(100).divmod(Money.new(9)) #=> [11, #<Money @cents=1>]
     def divmod(val)
       if val.is_a?(Money)
-        a = self.cents
-        b = self.currency == val.currency ? val.cents : val.exchange_to(self.currency).cents
+        a = self.original_cents
+        b = self.currency == val.currency ? val.original_cents : val.exchange_to(self.currency).original_cents
         q, m = a.divmod(b)
         return [q, Money.new(m, self.currency)]
       else
-        return [self.div(val), Money.new(self.cents.modulo(val), self.currency)]
+        return [self.div(val), Money.new(self.original_cents.modulo(val), self.currency)]
       end
     end
 
@@ -202,8 +202,8 @@ class Money
       b = b.exchange_to(a.currency) if b.is_a?(Money) and a.currency != b.currency
 
       a_sign, b_sign = :pos, :pos
-      a_sign = :neg if a.cents < 0
-      b_sign = :neg if (b.is_a?(Money) and b.cents < 0) or (b < 0)
+      a_sign = :neg if a.original_cents < 0
+      b_sign = :neg if (b.is_a?(Money) and b.original_cents < 0) or (b < 0)
 
       return a.modulo(b) if a_sign == b_sign
       a.modulo(b) - (b.is_a?(Money) ? b : Money.new(b, a.currency))
@@ -216,7 +216,7 @@ class Money
     # @example
     #   Money.new(-100).abs #=> #<Money @cents=100>
     def abs
-      Money.new(self.cents.abs, self.currency)
+      Money.new(self.original_cents.abs, self.currency)
     end
 
     # Test if the money amount is zero.
@@ -227,7 +227,7 @@ class Money
     #   Money.new(100).zero? #=> false
     #   Money.new(0).zero?   #=> true
     def zero?
-      cents == 0
+      original_cents == 0
     end
 
     # Test if the money amount is non-zero. Returns this money object if it is
@@ -239,7 +239,7 @@ class Money
     #   Money.new(100).nonzero? #=> #<Money @cents=100>
     #   Money.new(0).nonzero?   #=> nil
     def nonzero?
-      cents != 0 ? self : nil
+      original_cents != 0 ? self : nil
     end
 
   end
