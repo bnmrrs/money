@@ -262,7 +262,7 @@ class Money
   # @example
   #   Money.ca_dollar(100).to_s #=> "1.00"
   def to_s
-    unit, subunit = cents.abs.divmod(currency.subunit_to_unit).map(&:to_s)
+    unit, subunit = cents.abs.divmod(currency.original_subunit_to_unit).map(&:to_s)
     if currency.decimal_places == 0
       return "#{'-' if high_accuracy_cents < 0}#{unit}"
     end
